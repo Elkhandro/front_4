@@ -1,9 +1,10 @@
-import { useState } from "react";
-import "./App.css";
-import TechnologyCard from "src/components/TechnologyCard";
-import ProgressHeader from "src/components/ProgressHeader";
-import QuickActions from "src/components/QuickActions";
-import FilterTabs from "src/components/FilterTabs";
+import { useState, useEffect } from "react";
+import "first_project/src/App.css";
+import TechnologyCard from "first_project/src/components/TechnologyCard";
+import ProgressHeader from "first_project/src/components/ProgressHeader";
+import QuickActions from "first_project/src/components/QuickActions";
+import FilterTabs from "first_project/src/components/FilterTabs";
+import TechnologyNotes from "first_project/src/components/TechnologyNotes";
 
 function App() {
   const [technologies, setTechnologies] = useState([
@@ -12,20 +13,58 @@ function App() {
       title: "React Components",
       description: "Изучение базовых компонентов",
       status: "completed",
+      notes: "",
     },
     {
       id: 2,
       title: "JSX Syntax",
       description: "Освоение синтаксиса JSX",
       status: "in-progress",
+      notes: "",
     },
     {
       id: 3,
       title: "State Management",
       description: "Работа с состоянием компонентов",
       status: "not-started",
+      notes: "",
+    },
+    {
+      id: 4,
+      title: "React Hooks",
+      description: "Изучение основных хуков: useState, useEffect",
+      status: "not-started",
+      notes: "",
+    },
+    {
+      id: 5,
+      title: "Отклеить этикетки от бананов",
+      description: "Долгий тяжкий ручной труд",
+      status: "in-progress",
+      notes: "",
     },
   ]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("techTrackerData");
+    if (saved) {
+      setTechnologies(JSON.parse(saved));
+      console.log("Данные загружены из localStorage");
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("techTrackerData", JSON.stringify(technologies));
+    console.log("Данные сохранены в localStorage");
+  }, [technologies]);
+
+  const updateTechnologyNotes = (techId, newNotes) => {
+    setTechnologies((prevTech) =>
+      prevTech.map((tech) =>
+        tech.id === techId ? { ...tech, notes: newNotes } : tech
+      )
+    );
+  };
 
   const updateTechnologyStatus = (id) => {
     setTechnologies((prevTech) =>
@@ -73,6 +112,7 @@ function App() {
   };
 
   const [activeFilter, setActiveFilter] = useState("all");
+
   const filteredByStatus = technologies.filter((tech) => {
     switch (activeFilter) {
       case "not-started":
@@ -85,6 +125,14 @@ function App() {
         return true;
     }
   });
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredTechnologies = filteredByStatus.filter(
+    (tech) =>
+      tech.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tech.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="App">
@@ -99,6 +147,16 @@ function App() {
           onRandomNext={randomNextTechnology}
         />
 
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Поиск технологий..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <span>Найдено: {filteredTechnologies.length}</span>
+        </div>
+
         <FilterTabs
           activeFilter={activeFilter}
           onFilterChange={setActiveFilter}
@@ -106,7 +164,7 @@ function App() {
         />
 
         <div className="technologies-grid">
-          {filteredByStatus.map((tech) => (
+          {filteredTechnologies.map((tech) => (
             <div key={tech.id} className="technology-item">
               <TechnologyCard
                 id={tech.id}
@@ -114,6 +172,11 @@ function App() {
                 description={tech.description}
                 status={tech.status}
                 onStatusChange={updateTechnologyStatus}
+              />
+              <TechnologyNotes
+                notes={tech.notes}
+                onNotesChange={updateTechnologyNotes}
+                techId={tech.id}
               />
             </div>
           ))}
