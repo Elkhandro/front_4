@@ -145,6 +145,7 @@ function App() {
           onMarkAllCompleted={markAllAsCompleted}
           onResetAll={resetAllStatuses}
           onRandomNext={randomNextTechnology}
+          handleExport={technologies}
         />
 
         <div className="search-box">

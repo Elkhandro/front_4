@@ -1,4 +1,4 @@
-import "./TechnologyCard.css";
+import "first_project/src/components/TechnologyCard.css";
 
 function TechnologyCard({ id, title, description, status, onStatusChange }) {
   const getStatusIcon = () => {

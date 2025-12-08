@@ -1,4 +1,4 @@
-import "./TechnologyNotes.css";
+import "first_project/src/components/TechnologyNotes.css";
 
 function TechnologyNotes({ notes, onNotesChange, techId }) {
   return (
